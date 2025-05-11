@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 <html lang="en">
 
@@ -85,7 +84,6 @@
 </head>
 
 <body>
-
     <pre>
 &lt;!DOCTYPE html&gt;
 &lt;html lang="en"&gt;
@@ -109,27 +107,35 @@
 
     <div class="links">
         <a href="https://instagram.com/loxyland" target="_blank">My Instagram</a>
-        <a href="https://open.spotify.com/user/31sokd7ykgwntz5ayczjyrdx5ewq?si=65347e66879c4c45" target="_blank">My Spotipai</a>
+        <a href="https://open.spotify.com/user/31sokd7ykgwntz5ayczjyrdx5ewq?si=65347e66879c4c45" target="_blank">My
+            Spotipai</a>
     </div>
 
     <div class="spotify-container">
-        <iframe src="https://open.spotify.com/embed/track/7gqdZpe7MlTLA59viClLoY?utm_source=generator" allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture" loading="lazy"></iframe>
-        <iframe src="https://open.spotify.com/embed/track/6dOtVTDdiauQNBQEDOtlAB?utm_source=generator" allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture" loading="lazy"></iframe>
-        <iframe src="https://open.spotify.com/embed/track/1Q7EgiMOuwDcB0PJC6AzON?utm_source=generator" allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture" loading="lazy"></iframe>
+        <iframe src="https://open.spotify.com/embed/track/7gqdZpe7MlTLA59viClLoY?utm_source=generator"
+            allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture" loading="lazy"></iframe>
+        <iframe src="https://open.spotify.com/embed/track/6dOtVTDdiauQNBQEDOtlAB?utm_source=generator"
+            allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture" loading="lazy"></iframe>
+        <iframe src="https://open.spotify.com/embed/track/1Q7EgiMOuwDcB0PJC6AzON?utm_source=generator"
+            allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture" loading="lazy"></iframe>
     </div>
 
-    <div id="visitor" style="color: #00ff90; font-size: 14px;"></div>
+    <div id="visitor" style="color: #00ff90; font-size: 14px;">Loading visitor count...</div>
 
     <script>
-      fetch('/api/views')
-        .then(response => response.json())
-        .then(data => {
-          document.getElementById('visitor').textContent = `${data.count} jumlah pengunjung`;
+        // Update visitor count on page load
+        fetch('https://perfect-eta.vercel.app/api/counter', {
+            method: 'POST'
         })
-        .catch(err => {
-          console.error('Error fetching views:', err);
-        });
+            .then(response => response.json())
+            .then(data => {
+                document.getElementById('visitor').textContent = `${data.visitors} pengunjung`;
+            })
+            .catch(err => {
+                console.error('Error:', err);
+                document.getElementById('visitor').textContent = "Visitor counter offline";
+            });
     </script>
-
 </body>
+
 </html>
