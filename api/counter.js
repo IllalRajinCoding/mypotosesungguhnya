@@ -1,36 +1,49 @@
-import { kv } from '@vercel/kv';
+import { createClient } from '@supabase/supabase-js';
+
+// Inisialisasi Supabase client
+const supabase = createClient(
+  process.env.SUPABASE_URL,
+  process.env.SUPABASE_ANON_KEY
+);
 
 export default async function handler(req, res) {
   // Enable CORS
   res.setHeader('Access-Control-Allow-Origin', '*');
-  res.setHeader('Access-Control-Allow-Methods', 'GET, POST, OPTIONS');
+  res.setHeader('Access-Control-Allow-Methods', 'POST, GET, OPTIONS');
   res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
 
-  // Handle OPTIONS request for CORS preflight
+  // Handle CORS preflight
   if (req.method === 'OPTIONS') {
     return res.status(200).end();
   }
 
   try {
-    // Initialize counter if it doesn't exist
-    let visitors = await kv.get('visitors');
-    if (visitors === null) {
-      await kv.set('visitors', 0);
-      visitors = 0;
-    }
+    // 1. Dapatkan nilai counter saat ini
+    const { data: current, error } = await supabase
+      .from('visitor_counter')
+      .select('count')
+      .eq('id', 1)
+      .single();
 
-    // Increment counter for POST requests
-    if (req.method === 'POST') {
-      visitors = await kv.incr('visitors');
-    }
+    if (error) throw error;
 
+    // 2. Update counter (+1)
+    const { data: updated, error: updateError } = await supabase
+      .from('visitor_counter')
+      .update({ count: current.count + 1 })
+      .eq('id', 1)
+      .select();
+
+    if (updateError) throw updateError;
+
+    // 3. Return nilai terbaru
     return res.status(200).json({
       success: true,
-      visitors: Number(visitors)
+      visitors: updated[0].count
     });
 
   } catch (error) {
-    console.error('KV Error:', error);
+    console.error('Supabase Error:', error);
     return res.status(500).json({
       success: false,
       error: 'Failed to update counter',
