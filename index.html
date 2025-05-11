@@ -1,0 +1,135 @@
+
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>MyPorto - Illal</title>
+    <style>
+        body {
+            margin: 0;
+            background-color: #121212;
+            color: #00ff90;
+            font-family: 'Courier New', Courier, monospace;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 40px 20px;
+            box-sizing: border-box;
+            gap: 30px;
+            min-height: 100vh;
+        }
+
+        pre {
+            white-space: pre-wrap;
+            background-color: #1f1f1f;
+            padding: 25px;
+            border-radius: 12px;
+            max-width: 800px;
+            width: 100%;
+            box-shadow: 0 0 20px rgba(0, 255, 144, 0.4);
+            line-height: 1.6;
+        }
+
+        .spotify-container {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+            width: 100%;
+            max-width: 800px;
+        }
+
+        iframe {
+            border-radius: 12px;
+            width: 100%;
+            height: 152px;
+            box-shadow: 0 0 10px rgba(0, 255, 144, 0.4);
+        }
+
+        .links {
+            display: flex;
+            gap: 20px;
+            margin-top: -10px;
+        }
+
+        .links a {
+            text-decoration: none;
+            padding: 10px 20px;
+            background-color: #00ff90;
+            color: #121212;
+            border-radius: 8px;
+            font-weight: bold;
+            transition: background-color 0.3s ease;
+        }
+
+        .links a:hover {
+            background-color: #00d17c;
+        }
+
+        @media (max-width: 600px) {
+            pre {
+                font-size: 12px;
+            }
+
+            iframe {
+                height: 160px;
+            }
+
+            .links {
+                flex-direction: column;
+                align-items: center;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+    <pre>
+&lt;!DOCTYPE html&gt;
+&lt;html lang="en"&gt;
+
+&lt;head&gt;
+    &lt;meta charset="UTF-8"&gt;
+    &lt;meta name="viewport" content="width=device-width, initial-scale=1.0"&gt;
+    &lt;title&gt;MyPorto&lt;/title&gt;
+&lt;/head&gt;
+
+&lt;body&gt;
+    &lt;div&gt;Halo guys nama gw Robbanie Hillaly Kurniadien&lt;/div&gt;
+    &lt;div&gt;Panggil aja Illal atau seenaknya kalian aja&lt;/div&gt;
+    &lt;div&gt;Saya seorang web developer pemula&lt;/div&gt;
+    &lt;div&gt;Saya suka ngoding HTML dan CSS&lt;/div&gt;
+    &lt;div&gt;Anyway mut ig? spotipai? lesgo di folbek kok&lt;/div&gt;
+&lt;/body&gt;
+
+&lt;/html&gt;
+    </pre>
+
+    <div class="links">
+        <a href="https://instagram.com/loxyland" target="_blank">My Instagram</a>
+        <a href="https://open.spotify.com/user/31sokd7ykgwntz5ayczjyrdx5ewq?si=65347e66879c4c45" target="_blank">My Spotipai</a>
+    </div>
+
+    <div class="spotify-container">
+        <iframe src="https://open.spotify.com/embed/track/7gqdZpe7MlTLA59viClLoY?utm_source=generator" allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture" loading="lazy"></iframe>
+        <iframe src="https://open.spotify.com/embed/track/6dOtVTDdiauQNBQEDOtlAB?utm_source=generator" allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture" loading="lazy"></iframe>
+        <iframe src="https://open.spotify.com/embed/track/1Q7EgiMOuwDcB0PJC6AzON?utm_source=generator" allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture" loading="lazy"></iframe>
+    </div>
+
+    <div id="visitor" style="color: #00ff90; font-size: 14px;"></div>
+
+    <script>
+      fetch('/api/views')
+        .then(response => response.json())
+        .then(data => {
+          document.getElementById('visitor').textContent = `${data.count} jumlah pengunjung`;
+        })
+        .catch(err => {
+          console.error('Error fetching views:', err);
+        });
+    </script>
+
+</body>
+</html>
