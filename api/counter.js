@@ -1,40 +1,26 @@
-import fs from 'fs';
-import path from 'path';
-
-// Path to JSON file (will be created in .vercel/output directory)
-const counterPath = path.join(process.cwd(), 'data', 'visitors.json');
+import { kv } from '@vercel/kv';
 
 export default async function handler(req, res) {
-  // Enable CORS
+  // Enable CORS (Allows your frontend to call this API)
   res.setHeader('Access-Control-Allow-Origin', '*');
   res.setHeader('Access-Control-Allow-Methods', 'GET, POST');
 
   try {
-    let count = 0;
+    // Increment visitor count (Auto-initializes to 1 if key doesn't exist)
+    const visitors = await kv.incr('visitor_count');
 
-    // Read existing count or create new file
-    try {
-      const data = fs.readFileSync(counterPath, 'utf-8');
-      count = JSON.parse(data).count || 0;
-    } catch (err) {
-      if (err.code === 'ENOENT') {
-        // Create directory if doesn't exist
-        fs.mkdirSync(path.dirname(counterPath), { recursive: true });
-        fs.writeFileSync(counterPath, JSON.stringify({ count: 0 }));
-      } else {
-        throw err;
-      }
-    }
+    // Return the updated count
+    return res.status(200).json({
+      success: true,
+      visitors
+    });
 
-    // Increment count on POST request
-    if (req.method === 'POST') {
-      count++;
-      fs.writeFileSync(counterPath, JSON.stringify({ count }));
-    }
-
-    res.status(200).json({ visitors: count });
-  } catch (err) {
-    console.error('Counter error:', err);
-    res.status(500).json({ error: 'Failed to update counter' });
+  } catch (error) {
+    console.error('KV Error:', error);
+    return res.status(500).json({
+      success: false,
+      error: 'Failed to update counter',
+      details: error.message
+    });
   }
 }
