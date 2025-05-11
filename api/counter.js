@@ -1,18 +1,32 @@
 import { kv } from '@vercel/kv';
 
 export default async function handler(req, res) {
-  // Enable CORS (Allows your frontend to call this API)
+  // Enable CORS
   res.setHeader('Access-Control-Allow-Origin', '*');
-  res.setHeader('Access-Control-Allow-Methods', 'GET, POST');
+  res.setHeader('Access-Control-Allow-Methods', 'GET, POST, OPTIONS');
+  res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
+
+  // Handle OPTIONS request for CORS preflight
+  if (req.method === 'OPTIONS') {
+    return res.status(200).end();
+  }
 
   try {
-    // Increment visitor count (Auto-initializes to 1 if key doesn't exist)
-    const visitors = await kv.incr('visitor_count');
+    // Initialize counter if it doesn't exist
+    let visitors = await kv.get('visitors');
+    if (visitors === null) {
+      await kv.set('visitors', 0);
+      visitors = 0;
+    }
 
-    // Return the updated count
+    // Increment counter for POST requests
+    if (req.method === 'POST') {
+      visitors = await kv.incr('visitors');
+    }
+
     return res.status(200).json({
       success: true,
-      visitors
+      visitors: Number(visitors)
     });
 
   } catch (error) {
