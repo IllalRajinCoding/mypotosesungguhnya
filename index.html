@@ -124,19 +124,26 @@
 
     <script>
         async function updateCounter() {
-            try {
-                const response = await fetch('/api/counter', { method: 'POST' });
-                const data = await response.json();
+            const counterEl = document.getElementById('visitor')
 
-                if (data.success) {
-                    document.getElementById('visitor').textContent =
-                        `${data.visitors} pengunjung`;
+            try {
+                const response = await fetch('/api/counter')
+                const data = await response.json()
+
+                if (data?.success) {
+                    counterEl.textContent = `${data.visitors} pengunjung`
+                } else {
+                    counterEl.textContent = "Error: " + (data?.error || "Unknown error")
                 }
             } catch (error) {
-                console.error('Error:', error);
+                console.error('Fetch Error:', error)
+                counterEl.textContent = "Counter offline - Coba refresh"
+                counterEl.style.color = "#ff5555"
             }
         }
-        updateCounter();
+
+        // Jalankan saat page load
+        document.addEventListener('DOMContentLoaded', updateCounter)
     </script>
 </body>
 

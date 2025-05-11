@@ -1,53 +1,59 @@
-import { createClient } from '@supabase/supabase-js';
+import { createClient } from '@supabase/supabase-js'
 
-// Inisialisasi Supabase client
+// Debugging: Log env vars (cek di Vercel Logs)
+console.log('Supabase URL:', process.env.SUPABASE_URL?.slice(0, 10) + '...')
+console.log('Supabase Key:', process.env.SUPABASE_ANON_KEY?.slice(0, 10) + '...')
+
 const supabase = createClient(
-  process.env.SUPABASE_URL,
-  process.env.SUPABASE_ANON_KEY
-);
+  process.env.SUPABASE_URL || '',
+  process.env.SUPABASE_ANON_KEY || '',
+  {
+    auth: {
+      persistSession: false
+    }
+  }
+)
 
 export default async function handler(req, res) {
-  // Enable CORS
-  res.setHeader('Access-Control-Allow-Origin', '*');
-  res.setHeader('Access-Control-Allow-Methods', 'POST, GET, OPTIONS');
-  res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
-
-  // Handle CORS preflight
-  if (req.method === 'OPTIONS') {
-    return res.status(200).end();
-  }
+  // CORS headers
+  res.setHeader('Access-Control-Allow-Origin', '*')
+  res.setHeader('Access-Control-Allow-Methods', 'GET, POST')
 
   try {
-    // 1. Dapatkan nilai counter saat ini
-    const { data: current, error } = await supabase
+    // 1. Get current count
+    const { data, error } = await supabase
       .from('visitor_counter')
       .select('count')
       .eq('id', 1)
-      .single();
+      .single()
 
-    if (error) throw error;
+    // 2. Handle missing record
+    const currentCount = data?.count ?? 0
+    const newCount = currentCount + 1
 
-    // 2. Update counter (+1)
-    const { data: updated, error: updateError } = await supabase
+    // 3. Update count
+    const { error: updateError } = await supabase
       .from('visitor_counter')
-      .update({ count: current.count + 1 })
-      .eq('id', 1)
-      .select();
+      .upsert({ id: 1, count: newCount })
 
-    if (updateError) throw updateError;
+    if (updateError) throw updateError
 
-    // 3. Return nilai terbaru
     return res.status(200).json({
       success: true,
-      visitors: updated[0].count
-    });
+      visitors: newCount
+    })
 
   } catch (error) {
-    console.error('Supabase Error:', error);
+    console.error('API Error:', {
+      message: error.message,
+      stack: error.stack,
+      supabaseError: error.code
+    })
+
     return res.status(500).json({
       success: false,
-      error: 'Failed to update counter',
-      details: error.message
-    });
+      error: 'Internal error',
+      requestId: req.headers['x-vercel-id']
+    })
   }
 }
