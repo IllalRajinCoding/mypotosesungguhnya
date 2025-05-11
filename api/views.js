@@ -1,15 +1,25 @@
+export default async function handler(req, res) {
+  const firebaseUrl = "https://count-72f08-default-rtdb.firebaseio.com/L.json";
 
-import fs from 'fs';
-import path from 'path';
+  try {
+    // Get current value
+    const getRes = await fetch(firebaseUrl);
+    const current = await getRes.json();
+    const updated = (current || 0) + 1; 
 
-export default function handler(req, res) {
-  const filePath = path.resolve('./views.json');
-  const data = JSON.parse(fs.readFileSync(filePath, 'utf8'));
+    const updateRes = await fetch(firebaseUrl, {
+      method: 'PUT', 
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(updated)
+    });
 
-  data.count += 1;
+    if (!updateRes.ok) {
+      throw new Error("Failed to update data");
+    }
 
-  fs.writeFileSync(filePath, JSON.stringify(data, null, 2));
-
-  res.setHeader('Access-Control-Allow-Origin', '*');
-  res.status(200).json({ count: data.count });
+    res.status(200).json({ views: updated });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ error: 'Failed to update counter' });
+  }
 }
